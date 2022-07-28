@@ -100,3 +100,59 @@ Release:
 4. If it's last touch send `ABS_MT_SLOT` false, and another signal of finish transaction
 
 I hope this is completely true and the bugs that will arise during development will not be related to the sequence of events.
+
+# A little about chroot in arch
+
+## Backstory
+
+I was looking for a compiler for aarch64, I even found it (see something `gcc aarch64` in Google for your Linux distribution), but apparently the root in android is a humiliated boy who can’t do anything, in particular, run binaries. I was tired of it, besides one busybox was clearly not enough for convenient debugging of the code and sending the binary via adb after the slightest changes in the code is not the best. I decided to do everything in beauty, so that it was divine!
+
+## Preparation
+
+For all of the below to work, you need to have Magisk installed on your device (you can look for information on [xda](https://www.xda-developers.com/ "xda") or [4pda](https://4pda.to/ "4pda")) and adb on your desktop.
+
+## let's get to the point
+
+1. We go to the [arch linux arm site](https://archlinuxarm.org/about/downloads "Arch ARM downloads"), download the necessary package for your device, to find out what you need through adb or a terminal emulator, write "uname -m" this will be the architecture of your device
+2. It is highly desirable to have an SD card, because when you try to unpack the archive into internal storage, all links and rights will break. At least this is what happens on my Redmi Note 9 Pro with AOSP from the 9S version
+3. When connecting the card, the android offers to do something with the card, we politely refuse and umount it
+4. Next, look for it in block devices, for further examples I will use `/dev/block/mmcblk0p1`
+5. We format the card (if the card is already with the desired file system, change it to another, and then back) and mount it
+```sh
+mkfs.ext4 /dev/block/mmcblk0p1
+mkdir /mnt/arch
+mount /dev/block/mmcblk0p1 /mnt/arch
+```
+6. Unpack the downloaded archive to the root of the SD card
+7. Next, we link the `dev`, `proc` and `sys` directories from Android to our future chroot:
+```sh
+mount --bind /dev /mnt/arch/dev
+mount --bind /proc /mnt/arch/proc
+mount --bind /sys /mnt/arch/sys
+```
+8. And we begin to mock arch by copying the system and apex folders for the android binaries to work correctly:
+```sh
+cp -r /apex/ /mnt/arch/
+cp -r /system /mnt/arch/
+```
+9. Copy getevent if you want to quickly watch events from the chroot. If you don't need the previous one and you can skip this step:
+```sh
+cp /sbin/getevent /mnt/arch/usr/bin/
+```
+10. Next, go to chroot and enjoy the fact that you have almost a full-fledged Linux in your pocket:
+```sh
+chroot /mnt/arch /sbin/su - root
+```
+11. If you're having trouble resolving hostnames, add the correct DNS to resolv.conf. There may also be problems with access to this file, for example, I had it. It's okay, just delete the file and create a new one:
+```sh
+echo 8.8.8.8 >> /etc/resolv.conf
+# If it gives an error
+rm /etc/resolv.conf
+echo 8.8.8.8 >> /etc/resolv.conf # The file will automatically be created
+```
+12. In general, it's all, it remains to install gcc, git and software convenient for you:
+```sh
+pacman -Suy gcc git
+```
+When rebooting the device, remount the card along with dev, proc and sys.
+
