@@ -105,7 +105,7 @@ I hope this is completely true and the bugs that will arise during development w
 
 ## Backstory
 
-I was looking for a compiler for aarch64, I even found it (see something `gcc aarch64` in Google for your Linux distribution), but apparently the root in android is a humiliated boy who can’t do anything, in particular, run binaries. I was tired of it, besides one busybox was clearly not enough for convenient debugging of the code and sending the binary via adb after the slightest changes in the code is not the best. I decided to do everything in beauty, so that it was divine!
+I was looking for a compiler for aarch64, I even found it (see something `gcc aarch64` in Google for your Linux distro), but apparently the root in android is a humiliated boy who can’t do anything, in particular, run binaries. I was tired of it, besides one busybox was clearly not enough for convenient debugging of the code and sending the binary via adb after the slightest changes in the code is not the best. I decided to do everything in beauty, so that it was divine!
 
 ## Preparation
 
