@@ -29,22 +29,22 @@ sendevent /dev/input/eventX 3 54 600
 In code it look like this:
 ```C
 void send_ev(uint16_t t, uint16_t c, uint32_t v){
-	
-	ssize_t ret;							// I don't know why it's necessary
+    
+    ssize_t ret;                            // I don't know why it's necessary
 
-	struct input_event event;				// Event variable
-	
-	memset(&event, 0, sizeof(event));		// Clear event
-	
-	event.type = t;
-	event.code = c;
-	event.value = v;
-	
-	ret = write(f, &event, sizeof(event));	// And here, too, I don’t 		the function simply 
-											// know why we assign a			writes the event to 
-											// result of the function to	the event file
-											// the variable from the		
-											// beginning of the function	
+    struct input_event event;                // Event variable
+    
+    memset(&event, 0, sizeof(event));        // Clear event
+    
+    event.type = t;
+    event.code = c;
+    event.value = v;
+    
+    ret = write(f, &event, sizeof(event));  // And here, too, I don’t      the function simply 
+                                            // know why we assign a        writes the event to 
+                                            // result of the function to   the event file
+                                            // the variable from the        
+                                            // beginning of the function    
 }
 ```
 
@@ -58,12 +58,12 @@ add device 1: /dev/input/event1
                 KEY_M                 KEY_UP                KEY_LEFT              KEY_RIGHT
                 KEY_DOWN              KEY_POWER             KEY_SLEEP             KEY_WAKEUP
                 BTN_TOUCH
-    ABS (0003): ABS_MT_SLOT           : value 0, min 0, max 9,		fuzz 0, flat 0, resolution 0
-                ABS_MT_TOUCH_MAJOR    : value 0, min 0, max 255,	fuzz 0, flat 0, resolution 0
-                ABS_MT_POSITION_X     : value 0, min 0, max 1080,	fuzz 0, flat 0, resolution 0
-                ABS_MT_POSITION_Y     : value 0, min 0, max 2400,	fuzz 0, flat 0, resolution 0
-                ABS_MT_TRACKING_ID    : value 0, min 0, max 65535,	fuzz 0, flat 0, resolution 0
-                ABS_MT_PRESSURE       : value 0, min 0, max 255,	fuzz 0, flat 0, resolution 0
+    ABS (0003): ABS_MT_SLOT           : value 0, min 0, max 9,      fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MAJOR    : value 0, min 0, max 255,    fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_X     : value 0, min 0, max 1080,   fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_Y     : value 0, min 0, max 2400,   fuzz 0, flat 0, resolution 0
+                ABS_MT_TRACKING_ID    : value 0, min 0, max 65535,  fuzz 0, flat 0, resolution 0
+                ABS_MT_PRESSURE       : value 0, min 0, max 255,    fuzz 0, flat 0, resolution 0
   input props:
     INPUT_PROP_DIRECT
 ```
