@@ -145,10 +145,10 @@ chroot /mnt/arch /sbin/su - root
 ```
 11. If you're having trouble resolving hostnames, add the correct DNS to resolv.conf. There may also be problems with access to this file, for example, I had it. It's okay, just delete the file and create a new one:
 ```sh
-echo 8.8.8.8 >> /etc/resolv.conf
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
 # If it gives an error
 rm /etc/resolv.conf
-echo 8.8.8.8 >> /etc/resolv.conf # The file will automatically be created
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf # The file will automatically be created
 ```
 12. In general, it's all, it remains to install gcc, git and software convenient for you:
 ```sh
