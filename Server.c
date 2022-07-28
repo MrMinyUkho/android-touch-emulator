@@ -69,11 +69,11 @@ void send_ev(uint16_t t, uint16_t c, uint32_t v){
 	struct input_event event;
 	
 	memset(&event, 0, sizeof(event));
-    
+	
 	event.type = t;
-    event.code = c;
-    event.value = v;
-    
+	event.code = c;
+	event.value = v;
+	
 	ret = write(f, &event, sizeof(event));
 }
 
