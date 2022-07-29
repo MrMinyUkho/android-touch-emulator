@@ -1,9 +1,11 @@
-import socket
+gmport socket
 import time
 import pygame
 import os
 
 pygame.init()
+
+print("Test")
 
 #msgFromClient       = "Hello UDP Server"
 #bytesToSend         = str.encode(msgFromClient)
