@@ -18,7 +18,7 @@ int ev_ID;
 int f;
 bool istouch = false;
 uint16_t prev = 0;
-uint16_t touches[10];
+int touches[10];
 uint16_t curr = 0;
 int32_t rx = 0;
 int32_t ry = 0;
@@ -72,45 +72,74 @@ void send_ev(uint16_t t, uint16_t c, uint32_t v){
     ret = write(f, &event, sizeof(event));
 }
 
-void press(uint32_t x, uint32_t y, uint16_t free_t){
+int choise_by_touch(int t_marker){
+    for(int i = 0; i < 10; ++i){
+        if(touches[i] == t_marker){
+            return i;
+        }
+    }
+    return -1;
+}
+
+void press(uint32_t x, uint32_t y, uint16_t t){
     ev_ID+=1;
-    if(free_t != -1){
-        send_ev(3, 47, free_t);    // send touch number
-    }    
-    send_ev(3, 57, ev_ID);        // send ID of touch
-    send_ev(3, 48, 15);
-    send_ev(3, 58, 20);            // set pressure
-    if(free_t != -1){
-        send_ev(3, 47, free_t);    // send touch number
+    if(t != prev){
+        send_ev(3, 47, t);    // ABS_MT_SLOT
     }
-    send_ev(3, 54, x);
-    send_ev(3, 53, 1080 - y);
+    send_ev(3, 57, ev_ID);    // ABS_MT_TRACKING_ID
+    send_ev(3, 58, 20);       // ABS_MT_PRESSURE
+    send_ev(3, 48, 15);       // ABS_MT_TOUCH_MAJOR
+    if(t != prev){
+        send_ev(3, 47, t);    // ABS_MT_SLOT
+    }
+    send_ev(3, 54, x);        // ABS_MT_POSITION_Y
+    send_ev(3, 53, 1080 - y); // ABS_MT_POSITION_X
+
+    istouch = false;
+    for(int i = 0; i < 10; ++i){
+        if(touches[i] != 0){
+            istouch = true;
+        }
+    }
+    
     if(istouch == false){
-        send_ev(0, 0, 0);
-        send_ev(1, 330, 1);
+        send_ev(0, 0, 0);     // finish transaction
+        send_ev(1, 330, 1);   // BTN_TOUCH
     }
-    send_ev(0, 0, 0);
+    send_ev(0, 0, 0);         // finish transaction
+    prev = t;
 }
 
-void change_xy(uint32_t x, uint32_t y, uint16_t free_t){
-    if (free_t != -1) {
-        send_ev(3, 47, free_t);
+void change_xy(uint32_t x, uint32_t y, uint16_t t){
+    if (t != prev) {          
+        send_ev(3, 47, t);    // ABS_MT_SLOT
     }
-    send_ev(3, 54, x);
-    send_ev(3, 53, 1080 - y);
-    send_ev(0, 0, 0);
+    send_ev(3, 54, x);        // ABS_MT_POSITION_Y
+    send_ev(3, 53, 1080 - y); // ABS_MT_POSITION_X
+    send_ev(0, 0, 0);         // finish transaction
+    prev = t;
 }
 
-void release(uint16_t free_t){
-    if(free_t != -1){
-        send_ev(3, 47, free_t);
+void release(uint16_t t){
+    if(t != prev){
+        send_ev(3, 47, t);    // ABS_MT_SLOT
     }
-    send_ev(3, 57, 4294967295);
+    send_ev(3, 57, 4294967295); // ABS_MT_TRACKING_ID
+
+    istouch = false;
+    for(int i = 0; i < 10; ++i){
+        if(touches[i] != 0){
+            istouch = true;
+        }
+    }
+
     if(istouch == false){
-        send_ev(0, 0, 0);
-        send_ev(1, 330, 0);
+        send_ev(0, 0, 0);     // finish transaction
+        send_ev(1, 330, 0);   // BTN_TOUCH
     }
-    send_ev(0, 0, 0);
+    send_ev(0, 0, 0);         // finish transaction
+    touches[t] = 0;
+    prev = t;
 }
 
 int main(int argc, char *argv[]) {
@@ -581,28 +610,6 @@ int main(int argc, char *argv[]) {
     change_xy(1250, 530+100, -1);
     sleep(1);
     release(-1);
-
-    // --------------------------------------------
-
-    /*
-    press(300, 300, -1);
-    istouch = true;
-    sleep(1);
-    press(300, 400, 1);
-    sleep(1);
-    for(int i = 300; i < 400; ++i){
-        if(i % 10 == 0){
-            change_xy(i, 300, 0);
-            change_xy(i, 400, 1);
-            press(i, 500, 2);
-            release(-1);
-            sleep(1);
-        }
-    }
-    release(0);
-    istouch = false;
-    release(1);
-    */
 
     return 0;
 
