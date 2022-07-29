@@ -154,7 +154,7 @@ echo "nameserver 8.8.8.8" >> /etc/resolv.conf # The file will automatically be c
 ```sh
 pacman -Suy gcc git
 ```
-⋅⋅⋅The Arch ARM repositories have almost all the programs we are used to. If there is no program, you can always compile from source, with make it will not be difficult.
+    The Arch ARM repositories have almost all the programs we are used to. If there is no program, you can always compile from source, with make it will not be difficult.
 
 When rebooting the device, remount the card along with dev, proc and sys.
 
