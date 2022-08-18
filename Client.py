@@ -1,4 +1,4 @@
-gmport socket
+import socket
 import time
 import pygame
 import os

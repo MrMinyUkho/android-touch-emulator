@@ -595,22 +595,5 @@ int main(int argc, char *argv[]) {
             }
         }         
     }
-
-    press(1250, 530, -1);
-    sleep(1);
-    istouch = true;
-    for(int i = 0; i < 100; ++i){
-        change_xy(1250, 530+i, -1);
-        //sleep(0.1);
-    }
-    sleep(1);
-    release(-1);
-    press(1250, 530, -1);
-    sleep(1);
-    change_xy(1250, 530+100, -1);
-    sleep(1);
-    release(-1);
-
     return 0;
-
 }

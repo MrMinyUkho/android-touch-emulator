@@ -17,7 +17,9 @@ If you do not specify parameters, then the command will display events occurring
 
 For the convenience of debugging and satisfying my perverse fantasies, the entire server part was written on the phone in a chroot in Arch Linux ARM.
 
-# How it work?
+# How it work and why?
+
+If you need to emulate clicks with a minimum delay, unlike `adb input` and `sendevent`, then this method is the best.
 
 I didn't quite understand it myself, but I'll try to explain
 
@@ -143,7 +145,7 @@ cp /sbin/getevent /mnt/arch/usr/bin/
 ```sh
 chroot /mnt/arch /sbin/su - root
 ```
-11. If you're having trouble resolving hostnames, add the correct DNS to resolv.conf. There may also be problems with access to this file, for example, I had it. It's okay, just delete the file and create a new one:
+11. If you're having trouble resolving hostnames, add the correct DNS to `resolv.conf`. There may also be problems with access to this file, for example, I had it. It's okay, just delete the file and create a new one:
 ```sh
 echo "nameserver 8.8.8.8" >> /etc/resolv.conf
 # If it gives an error
