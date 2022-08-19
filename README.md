@@ -1,7 +1,8 @@
 # android-touch-emulator
 This is a client-server application that allows you to control your smartphone from another device.
+Although you can only use the phone program without a UDP server.
 
-In the source code, the program allows you to control PUBG from a computer, multi-touch is implemented.
+The advantages of this application are the absence of delay, flexibility in settings, which allows, for example, to play games that do not support gamepads, creating control schemes for them by pressing and swiping. Or you can use arduino to create fancy controllers and communicate via UART.
 
 It is based on the `sendevent.c` source code from Google. It allows you to send events to input devices located in `/dev/input/eventX` where X is the device number. You can view a list of your devices using the command (requires root):
 ```sh
@@ -33,26 +34,23 @@ In code it look like this:
 void send_ev(uint16_t t, uint16_t c, uint32_t v){
     
     ssize_t ret;                            // I don't know why it's necessary
-
-    struct input_event event;                // Event variable
+    struct input_event event;               // Event variable
     
-    memset(&event, 0, sizeof(event));        // Clear event
+    memset(&event, 0, sizeof(event));       // Clear event
     
     event.type = t;
     event.code = c;
     event.value = v;
     
-    ret = write(f, &event, sizeof(event));  // And here, too, I don’t      the function simply 
-                                            // know why we assign a        writes the event to 
-                                            // result of the function to   the event file
-                                            // the variable from the        
-                                            // beginning of the function    
+    ret = write(f, &event, sizeof(event));  // the function simply 
+                                            // writes the event to 
+                                            // the event file  
 }
 ```
 
-This is part of the output of the getevent -pl command
+This is part of the output of the `getevent -pl` command
 ```
-add device 1: /dev/input/event1
+add device Y: /dev/input/eventX
   name:     "fts_ts"
   events:
     KEY (0001): KEY_W                 KEY_E                 KEY_O                 KEY_S
@@ -66,6 +64,23 @@ add device 1: /dev/input/event1
                 ABS_MT_POSITION_Y     : value 0, min 0, max 2400,   fuzz 0, flat 0, resolution 0
                 ABS_MT_TRACKING_ID    : value 0, min 0, max 65535,  fuzz 0, flat 0, resolution 0
                 ABS_MT_PRESSURE       : value 0, min 0, max 255,    fuzz 0, flat 0, resolution 0
+  input props:
+    INPUT_PROP_DIRECT
+```
+And then the output of getevent -p, where all human-readable words are replaced by hex codes:
+```
+add device Y: /dev/input/eventX
+  name:     "fts_ts"
+  events:
+    KEY (0001): 0011  0012  0018  001f  0026  002c  002e  002f 
+                0032  0067  0069  006a  006c  0074  008e  008f 
+                014a 
+    ABS (0003): 002f  : value 0, min 0, max 9,     fuzz 0, flat 0, resolution 0
+                0030  : value 0, min 0, max 255,   fuzz 0, flat 0, resolution 0
+                0035  : value 0, min 0, max 1080,  fuzz 0, flat 0, resolution 0
+                0036  : value 0, min 0, max 2400,  fuzz 0, flat 0, resolution 0
+                0039  : value 0, min 0, max 65535, fuzz 0, flat 0, resolution 0
+                003a  : value 0, min 0, max 255,   fuzz 0, flat 0, resolution 0
   input props:
     INPUT_PROP_DIRECT
 ```
@@ -113,9 +128,9 @@ I was looking for a compiler for aarch64, I even found it (see something `gcc aa
 
 For all of the below to work, you need to have Magisk installed on your device (you can look for information on [xda](https://www.xda-developers.com/ "xda") or [4pda](https://4pda.to/ "4pda")) and adb on your desktop.
 
-## let's get to the point
+## Let's get to the point
 
-1. We go to the [arch linux arm site](https://archlinuxarm.org/about/downloads "Arch ARM downloads"), download the necessary package for your device, to find out what you need through adb or a terminal emulator, write "uname -m" this will be the architecture of your device
+1. We go to the [arch linux arm site](https://archlinuxarm.org/about/downloads "Arch ARM downloads"), Choose "Multi-platform" package, ARMv7 or ARMv8.
 2. It is highly desirable to have an SD card, because when you try to unpack the archive into internal storage, all links and rights will break. At least this is what happens on my Redmi Note 9 Pro with AOSP from the 9S version
 3. When connecting the card, the android offers to do something with the card, we politely refuse and umount it
 4. Next, look for it in block devices, for further examples I will use `/dev/block/mmcblk0p1`
@@ -128,13 +143,13 @@ mount /dev/block/mmcblk0p1 /mnt/arch
 6. Unpack the downloaded archive to the root of the SD card
 7. Next, we link the `dev`, `proc` and `sys` directories from Android to our future chroot:
 ```sh
-mount --bind /dev /mnt/arch/dev
+mount --bind /dev  /mnt/arch/dev
 mount --bind /proc /mnt/arch/proc
-mount --bind /sys /mnt/arch/sys
+mount --bind /sys  /mnt/arch/sys
 ```
 8. And we begin to mock arch by copying the system and apex folders for the android binaries to work correctly:
 ```sh
-cp -r /apex/ /mnt/arch/
+cp -r /apex/  /mnt/arch/
 cp -r /system /mnt/arch/
 ```
 9. Copy getevent if you want to quickly watch events from the chroot. If you don't need the previous one and you can skip this step:
